@@ -1,33 +1,40 @@
 # c4c-ship
 
-Code for Creatives skill that pushes a student's site to GitHub then deploys to Cloudflare Pages. Auto-detects whether it's the first ship (sets up the repo + project) or a subsequent ship (one-command update). Falls back to the /c4c-setup steps inline if anything is missing.
+A Code for Creatives skill. It puts your website online with Cloudflare and saves its files to GitHub. Works on Mac and Windows.
 
 ## Install
+
+Ask Claude Code to run this for you, or paste it into your terminal:
 
 ```
 mkdir -p ~/.claude/skills && git clone https://github.com/alexdobrenko/c4c-ship-skill ~/.claude/skills/c4c-ship
 ```
 
+Then close Claude Code and open it again, so it sees the new skill.
+
 ## Use
 
-In Claude Code, `cd` to the folder with your site (the one with `index.html`), then type:
+Open Claude Code in the folder that has your site (the one with `index.html`) and say:
 
 ```
-/c4c-ship
+put my site online
 ```
 
-The skill verifies your setup, then either:
+The first time, Claude:
 
-- **First time**: walks through `git init`, GitHub repo create, Cloudflare project create, deploy. Saves the project name so the next ship is friction-free.
-- **Subsequent ship**: asks what changed, commits, pushes to GitHub, redeploys to Cloudflare. Usually under a minute.
+1. Checks your setup.
+2. Shows you exactly which files will be public, and asks before anything goes online.
+3. Asks for a name and puts the site online at an address that ends in `workers.dev`.
+4. Saves the folder to a private GitHub repo.
 
-## Update
+After that, say "update my site" whenever you change something. It takes under a minute.
+
+## Update the skill
 
 ```
 cd ~/.claude/skills/c4c-ship && git pull
 ```
 
-## Requires
+## Before you use it
 
-- macOS
-- Run `/c4c-setup` first if you haven't (Homebrew, GitHub CLI, Node, Wrangler, GitHub + Cloudflare account auth). The skill will catch a missing setup and either walk you through fixing the specific gap or tell you to run `/c4c-setup` if you're starting from nothing.
+Do the Week 3 setup first: a GitHub account, a Cloudflare account, the three tools, and both sign-ins. If something is missing, the skill tells you which part.
