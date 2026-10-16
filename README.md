@@ -27,7 +27,7 @@ The first time, Claude:
 3. Asks for a name and puts the site online at an address that ends in `workers.dev`.
 4. Saves the folder to a private GitHub repo.
 
-After that, say "update my site" whenever you change something. It takes under a minute.
+After that, say "update my site" whenever you change something. Claude shows you the new version on your own computer first, and puts it online when you say yes.
 
 ## Update the skill
 

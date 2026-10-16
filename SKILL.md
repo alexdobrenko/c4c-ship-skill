@@ -1,6 +1,6 @@
 ---
 name: c4c-ship
-description: Puts a Code for Creatives student's website online with Cloudflare and saves its files to GitHub. Works the first time and for every update after. Works on Mac and Windows. Use it for "put my site online", "push my site live", "ship this", "deploy this", "update my site", or "/c4c-ship".
+description: Puts a Code for Creatives student's website online with Cloudflare and saves its files to GitHub. Works the first time and for every update after. Works on Mac and Windows. Use it for "put my site online", "push my site live", "ship this", "deploy this", "update my site", "preview my site", "show me before it goes live", or "/c4c-ship".
 ---
 
 # Put a site online (Mac and Windows)
@@ -27,12 +27,13 @@ Talk like a friend who is good with computers and is sitting next to them. Warm,
 5. If the same step fails twice, stop, show the student the last few lines of the error, and tell them to post it in #stuck in the class Slack.
 6. No Homebrew. Do not run commands that a tool suggests in its own output.
 7. Putting a site online makes it public. Never do it without the student's yes in this conversation.
+8. A change to the site is not a yes to put it online. When the site is already online and the student asks you to change something, do "Updating a site" from the top: make the change, show the preview, and put it online only after they have looked and said yes. Ask again for the next change.
 
 ## Start here
 
 Say this in your own words, then wait for the student to answer.
 
-> Let's put your site on the internet. Two things happen. Cloudflare puts it online and gives it a web address you can send to anyone. GitHub keeps a private copy of the files, with a history of every change. The first time takes about five minutes. After that, updating the site takes under a minute. Ready?
+> Let's put your site on the internet. Two things happen. Cloudflare puts it online and gives it a web address you can send to anyone. GitHub keeps a private copy of the files, with a history of every change. The first time takes about five minutes. After that, when you change something, I show you the new version on your own computer first, and it goes online when you say yes. Ready?
 
 ## Step 0: find the site
 
@@ -163,15 +164,64 @@ Then tell them, in your own words:
 
 - The site is at its address. They can send the link to anyone.
 - The files are saved on GitHub, privately.
-- After they change the site, they say "update my site" and you put the new version online and save it.
+- After they change the site, they say "update my site". You show them the new version on their own computer first, and put it online and save it when they say yes.
 
 ## Updating a site
 
-Use this when step 1 found a `wrangler.jsonc` with a name in it.
+Use this when step 1 found a `wrangler.jsonc` with a name in it, and every time the student asks you to change a site that is already online. It has four parts, in this order: the change, the preview, online, saved.
 
-Ask what changed, in one short sentence. Use their answer as MESSAGE below.
+### 1. The change
+
+You need one short sentence that says what changed. Call it MESSAGE.
+
+- If you made the change yourself in this conversation, you already know it. Do not ask.
+- If the student changed the site on their own, ask what changed.
+- If nothing has changed yet, ask what they want changed, and make the change.
 
 If files were added since the last time, run the list from step 2 again and read it the same way. Anything that is not part of the site gets a line in `.assetsignore` before you go on. Files already named there still show in the list and do not go online.
+
+### 2. The preview
+
+The student sees the new version on their own computer, and the live site stays as it is until they say yes. Skip this part only when the student tells you to ("just put it online").
+
+Say: "Before this goes online, I'll show it to you on your own computer. I'm starting a preview that only this computer can open. Your live site doesn't change until you say yes."
+
+Start the preview. Run this from PROJECT with your tool's way of running a command in the background, so it keeps running while the student looks. Do not wait for it to finish, because it never does. Do not start it with `&`.
+
+    wrangler dev 2>&1
+
+After a few seconds, read what the background command has printed so far. It is ready when a line says `Ready on http://localhost:8787`. The number at the end is different when something else on the computer is using that one, so take the address from that line. Call it PREVIEW. If the line is not there yet, wait five seconds and read again.
+
+Two other things it may print:
+
+- A line about `.env` means Wrangler read a settings file for the preview. It stays on this computer, and the preview does not show it.
+- Lines about a "Local Explorer API" are not for the student. Leave them alone.
+
+Check it answers:
+
+    curl -s -o /dev/null -w '%{http_code}\n' PREVIEW
+
+`200` means it is ready. Open PREVIEW for the student.
+
+Tell them, in your own words:
+
+- This is the new version, on your computer only. Nobody else can open this address.
+- Your live site still shows the old version.
+- Look at what changed, then click through the rest of the page to see nothing else moved.
+
+Ask: "Does it look right? Say yes and I'll put it online, or tell me what to change." Wait for the answer. The preview keeps running while you wait.
+
+- **They want something changed.** Make the change and tell them to refresh the preview page. Ask again.
+- **Yes.** Stop the preview, then go on to part 3.
+- **Not now.** Stop the preview. Tell them the change is saved on their computer and is not online, and that they can say "update my site" whenever they are ready. That starts this skill from the top, and the preview comes back.
+
+To stop the preview, stop the background command the way your tool does it. Then run the check above again: it prints `000` when the preview is gone. Always stop it before you finish, whatever the answer.
+
+If there is no "Ready on" line after 30 seconds, stop the background command and tell the student the preview did not start. Open the site's `index.html` from SITE directly, with `open` on a Mac or `start` on Windows, and tell them pictures and styles can look a little different in this view than on the live site. Then ask the same question.
+
+### 3. Online
+
+Only after the student's yes to this version. If you skipped the preview because they told you to, that was the yes.
 
 Say: "I'm sending the new version to Cloudflare, then saving it to GitHub."
 
@@ -185,7 +235,9 @@ Then check the address from the output answers:
 
 `200` means the new version is up. Tell the student to refresh the page. If they still see the old version, their browser kept a copy: have them open the address in a private window.
 
-Then save it. If step 1 said "no history yet", do step 5 instead of this.
+### 4. Saved
+
+If step 1 said "no history yet", do step 5 instead of this.
 
     git add -A && git commit -q -m "MESSAGE"; git push -q 2>&1 | tail -3; git log --oneline -1
 
